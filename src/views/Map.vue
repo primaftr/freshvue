@@ -128,13 +128,14 @@ export default {
     },
 
     //Check apakah calcDistance a ke b pernah dipanggil
-    checkMiniRoute: function (o, d) {
+    checkMiniRoute: async function (o, d) {
       if (d === undefined) {
         return;
       } else {
         //mengambil promise calcDistance
-        let jara = this.calcDistance(o, d).then((res) => {
-          return res.rows[0].elements[0].distance.value;
+        //ssss
+        let jara = await this.calcDistance(o, d).then((res) => {
+          return res.rows[0].gielements[0].distance.value;
         });
         //jika rute dari node a belum ada sama sekali
         if (this.savedMiniRoute[o] === undefined) {
