@@ -5,6 +5,7 @@
     <button class="mx-3" v-on:click="calcFitness">Hitung Fitness</button>
     <button class="mx-3" v-on:click="ga">GA</button>
     <div>{{ bestPop }} = {{ bestDist }}</div>
+    <div>{{ generasi }}</div>
     <div class="map">
       <gmap-map
         :center="{ lat: 10, lng: 10 }"
@@ -52,13 +53,20 @@ export default {
   data() {
     return {
       gen: {
-        1: { lat: 0.4773651, lng: 101.4048186 },
-        2: { lat: 0.5117239, lng: 101.4397909 },
-        3: { lat: 0.4505657, lng: 101.4011792 },
-        4: { lat: 0.4698786, lng: 101.3811158 },
-        5: { lat: 0.4737488, lng: 101.472948 },
-        6: { lat: 0.536217, lng: 101.4496793 },
-        7: { lat: 0.5701812, lng: 101.4233154 },
+        1: { lat: 0.4773651, lng: 101.4048186 }, //one
+        2: { lat: 0.5117239, lng: 101.4397909 }, //cendrawasih skjd
+        3: { lat: 0.4505657, lng: 101.4011792 }, //rumah isan
+        4: { lat: 0.4698786, lng: 101.3811158 }, //unri
+        5: { lat: 0.4737488, lng: 101.472948 }, //rumah jejen
+        6: { lat: 0.536217, lng: 101.4496793 }, //jl setia budhi
+        7: { lat: 0.5701812, lng: 101.4233154 }, //pcr
+        8: { lat: 0.51184, lng: 101.442047 }, //rumah
+        9: { lat: 0.502613, lng: 101.442806 }, //sma5
+        10: { lat: 0.4761, lng: 101.429348 }, //rumah
+        11: { lat: 0.444083, lng: 101.420983 }, //rumah toho
+        12: { lat: 0.524359, lng: 101.444037 }, //jalan pangeran
+        // 13: { lat: 0.51184, lng: 101.442047 }, //rumah
+        // 14: { lat: 0.51184, lng: 101.442047 }, //rumah
       },
       population: [],
       order: [],
@@ -74,12 +82,12 @@ export default {
     };
   },
 
-  created() {
-    if (localStorage.savedMiniRoute) {
-      var isi = JSON.parse(localStorage.savedMiniRoute);
-      this.savedMiniRoute = isi;
-    }
-  },
+  // created() {
+  //   if (localStorage.savedMiniRoute) {
+  //     var isi = JSON.parse(localStorage.savedMiniRoute);
+  //     this.savedMiniRoute = isi;
+  //   }
+  // },
 
   methods: {
     renderNode: function (i, e) {
@@ -133,7 +141,11 @@ export default {
 
     cekData: function (o, d, value) {
       var data = JSON.parse(localStorage.savedMiniRoute);
-      data[o][d] = value;
+      if (data[o]) {
+        data[o][d] = value;
+      } else {
+        data[o] = { [d]: value };
+      }
       localStorage.savedMiniRoute = JSON.stringify(data);
     },
     pickOne: function (list, prob) {
@@ -162,7 +174,7 @@ export default {
         let orderA = this.pickOne(this.population, this.fitness);
         let orderB = this.pickOne(this.population, this.fitness);
         let order = this.crossOver(orderA, orderB);
-        let mutationRate = 10 / 100;
+        let mutationRate = 1 / 100;
         this.mutate(order, mutationRate);
         this.newPop[i] = order;
         this.savedPop.push(order.slice());
@@ -192,7 +204,7 @@ export default {
     },
 
     ga: async function () {
-      for (let i = 0; i < 1000; i++) {
+      for (let i = 0; i < 5000; i++) {
         await this.calcFitness().then(() => {
           this.nextGen();
         });
@@ -239,11 +251,12 @@ export default {
           // console.log(`Rute ${o}${d} diinput! Value = ${jara} `);
           this.savedMiniRoute[o] = { [d]: jara };
           this.$set(this.savedMiniRoute, o, this.savedMiniRoute[o]);
-          this.cekData(o, d, jara);
+          // this.cekData(o, d, jara);
           return this.savedMiniRoute[o][d];
         }
         //jika node sudah pernah di panggil dan tersimpan
         else if (this.savedMiniRoute[o][d]) {
+          await this.savedMiniRoute[o][d];
           // console.log(`Rute ${o}${d} sudah ada, api tidak dipanggil`);
           return this.savedMiniRoute[o][d];
         }
@@ -255,7 +268,7 @@ export default {
           // console.log(`Rute ${o}${d} ditambahkan! Value ${jara}`);
           this.savedMiniRoute[o][d] = jara;
           this.$set(this.savedMiniRoute[o], d, jara);
-          this.cekData(o, d, jara);
+          // this.cekData(o, d, jara);
           return this.savedMiniRoute[o][d];
         }
       }
